@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Shelf</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F5F0E8;
+    --warm-white: #FAF7F2;
+    --ink: #1A1612;
+    --bark: #6B4F3A;
+    --copper: #B5703A;
+    --sage: #7A9E7E;
+    --dusty: #C4A882;
+    --muted: #9E8E7E;
+    --card-bg: #FFFDF9;
+    --border: #E8E0D4;
+    --shadow: rgba(26,22,18,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+  }
+  header {
+    background: var(--ink);
+    color: var(--cream);
+    padding: 20px 20px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding-top: max(20px, env(safe-area-inset-top));
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .app-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    letter-spacing: -0.5px;
+    line-height: 1;
+  }
+  .app-title em { font-style: italic; color: var(--dusty); }
+  .header-actions { display: flex; gap: 8px; }
+  .btn-icon {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--cream);
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+    transition: background 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-icon:active { background: rgba(255,255,255,0.2); }
+  .tabs {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    flex-shrink: 0;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    color: rgba(245,240,232,0.55);
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+    white-space: nowrap;
+  }
+  .tab.active { background: var(--copper); color: white; }
+  .tab .count {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    border-radius: 10px;
+    padding: 0 5px;
+    font-size: 11px;
+    margin-left: 4px;
+  }
+  .search-wrap {
+    padding: 12px 16px;
+    background: var(--warm-white);
+    border-bottom: 1px solid var(--border);
+  }
+  .search-input {
+    width: 100%;
+    background: var(--card-bg);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 14px 10px 36px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.15s;
+    -webkit-appearance: none;
+  }
+  .search-input:focus { border-color: var(--copper); }
+  .search-wrap-inner { position: relative; }
+  .search-icon {
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 16px;
+    pointer-events: none;
+  }
+  .book-list {
+    padding: 12px 16px 100px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+  }
+  .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
+  .empty-state h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .empty-state p { font-size: 14px; line-height: 1.5; }
+  .book-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px 16px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    cursor: pointer;
+    transition: box-shadow 0.15s, transform 0.1s;
+    -webkit-tap-highlight-color: transparent;
+    position: relative;
+    overflow: hidden;
+  }
+  .book-card:active { transform: scale(0.985); }
+  .book-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    border-radius: 4px 0 0 4px;
+  }
+  .book-card[data-status="want"]::before { background: var(--copper); }
+  .book-card[data-status="reading"]::before { background: var(--sage); }
+  .book-card[data-status="read"]::before { background: var(--bark); }
+  .book-card[data-status="not_interested"]::before { background: var(--muted); }
+  .book-spine {
+    width: 44px;
+    height: 64px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-style: italic;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  }
+  .book-info { flex: 1; min-width: 0; }
+  .book-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.3;
+    margin-bottom: 2px;
+    color: var(--ink);
+  }
+  .book-author { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .book-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .status-badge {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.3px;
+  }
+  .status-want { background: #FDF0E6; color: var(--copper); }
+  .status-reading { background: #EFF6F0; color: #4A7A4E; }
+  .status-read { background: #F2EBE6; color: var(--bark); }
+  .status-not_interested { background: #F0EEEC; color: var(--muted); }
+  .stars { display: flex; gap: 1px; }
+  .star { font-size: 12px; }
+  .star.filled { color: var(--copper); }
+  .star.empty { color: var(--border); }
+  .book-genre {
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--cream);
+    padding: 2px 7px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+  .sort-bar {
+    padding: 8px 16px 4px;
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    background: var(--warm-white);
+  }
+  .sort-bar::-webkit-scrollbar { display: none; }
+  .sort-chip {
+    flex-shrink: 0;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: all 0.15s;
+  }
+  .sort-chip.active {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--cream);
+  }
+  .fab {
+    position: fixed;
+    bottom: max(24px, env(safe-area-inset-bottom, 24px));
+    right: 20px;
+    width: 58px; height: 58px;
+    background: var(--copper);
+    color: white;
+    border-radius: 18px;
+    border: none;
+    font-size: 26px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(181,112,58,0.4);
+    z-index: 200;
+    transition: transform 0.15s, box-shadow 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .fab:active { transform: scale(0.92); box-shadow: 0 2px 10px rgba(181,112,58,0.3); }
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(26,22,18,0.55);
+    z-index: 300;
+    backdrop-filter: blur(3px);
+    align-items: flex-end;
+  }
+  .overlay.open { display: flex; }
+  .sheet {
+    background: var(--warm-white);
+    border-radius: 24px 24px 0 0;
+    padding: 0 0 max(24px, env(safe-area-inset-bottom)) 0;
+    width: 100%;
+    max-height: 92vh;
+    overflow-y: auto;
+    animation: slideUp 0.28s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  .sheet-handle {
+    width: 36px; height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 12px auto 0;
+  }
+  .sheet-header {
+    padding: 16px 20px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+  .sheet-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 600;
+  }
+  .btn-close {
+    background: var(--cream);
+    border: none;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    font-size: 18px;
+    color: var(--muted);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .sheet-body { padding: 20px; }
+  .field { margin-bottom: 18px; }
+  .field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 7px;
+  }
+  .field input, .field textarea, .field select {
+    width: 100%;
+    background: var(--card-bg);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.15s;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--copper); }
+  .field textarea { resize: none; min-height: 80px; line-height: 1.5; }
+  .status-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .status-option {
+    padding: 10px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+    color: var(--muted);
+  }
+  .status-option.selected { border-color: var(--copper); background: #FDF0E6; color: var(--copper); }
+  .status-option[data-val="reading"].selected { border-color: var(--sage); background: #EFF6F0; color: #4A7A4E; }
+  .status-option[data-val="read"].selected { border-color: var(--bark); background: #F2EBE6; color: var(--bark); }
+  .status-option[data-val="not_interested"].selected { border-color: var(--muted); background: #F0EEEC; color: var(--muted); }
+  .star-rating { display: flex; gap: 8px; }
+  .star-btn {
+    font-size: 28px;
+    cursor: pointer;
+    transition: transform 0.1s;
+    -webkit-tap-highlight-color: transparent;
+    color: var(--border);
+    background: none;
+    border: none;
+    padding: 2px;
+  }
+  .star-btn.active { color: var(--copper); }
+  .star-btn:active { transform: scale(1.3); }
+  .btn-primary {
+    width: 100%;
+    background: var(--ink);
+    color: var(--cream);
+    border: none;
+    border-radius: 14px;
+    padding: 15px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    -webkit-tap-highlight-color: transparent;
+    margin-top: 4px;
+  }
+  .btn-primary:active { opacity: 0.8; }
+  .btn-danger {
+    width: 100%;
+    background: transparent;
+    color: #C0392B;
+    border: 1.5px solid #E8C4C0;
+    border-radius: 14px;
+    padding: 13px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 10px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .data-panel {
+    background: var(--card-bg);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .data-panel-row {
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .data-panel-row:last-child { border-bottom: none; }
+  .data-panel-row:active { background: var(--cream); }
+  .data-panel-label { font-size: 15px; font-weight: 500; }
+  .data-panel-desc { font-size: 12px; color: var(--muted); margin-top: 1px; }
+  .data-panel-icon { font-size: 20px; }
+  .toast {
+    position: fixed;
+    bottom: max(90px, calc(env(safe-area-inset-bottom) + 80px));
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--ink);
+    color: var(--cream);
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 500;
+    opacity: 0;
+    transition: all 0.3s;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  textarea.json-area {
+    font-family: 'SF Mono', monospace;
+    font-size: 12px;
+    min-height: 160px;
+    background: #1A1612;
+    color: #C4A882;
+    border-color: #333;
+  }
+  textarea.json-area:focus { border-color: var(--copper); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div class="app-title">My <em>Shelf</em></div>
+    <div class="header-actions">
+      <button class="btn-icon" onclick="openDataSheet()" title="Import / Export">⇅</button>
+    </div>
+  </div>
+  <div class="tabs" id="tabs">
+    <div class="tab active" data-status="all" onclick="switchTab(this)">All <span class="count" id="count-all">0</span></div>
+    <div class="tab" data-status="want" onclick="switchTab(this)">Want to Read <span class="count" id="count-want">0</span></div>
+    <div class="tab" data-status="reading" onclick="switchTab(this)">Reading <span class="count" id="count-reading">0</span></div>
+    <div class="tab" data-status="read" onclick="switchTab(this)">Read <span class="count" id="count-read">0</span></div>
+    <div class="tab" data-status="not_interested" onclick="switchTab(this)">Not Interested <span class="count" id="count-not_interested">0</span></div>
+  </div>
+</header>
+
+<div class="search-wrap">
+  <div class="search-wrap-inner">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" type="search" placeholder="Search title, author, genre…" oninput="renderList()" id="searchInput">
+  </div>
+</div>
+
+<div class="sort-bar">
+  <button class="sort-chip active" data-sort="date" onclick="setSort(this)">Recently Added</button>
+  <button class="sort-chip" data-sort="title" onclick="setSort(this)">Title A–Z</button>
+  <button class="sort-chip" data-sort="author" onclick="setSort(this)">Author</button>
+  <button class="sort-chip" data-sort="rating" onclick="setSort(this)">Top Rated</button>
+</div>
+
+<div class="book-list" id="bookList"></div>
+
+<button class="fab" onclick="openAddSheet()">+</button>
+
+<div class="overlay" id="editOverlay" onclick="overlayClick(event, 'editOverlay')">
+  <div class="sheet" id="editSheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <div class="sheet-title" id="sheetTitle">Add Book</div>
+      <button class="btn-close" onclick="closeSheet('editOverlay')">✕</button>
+    </div>
+    <div class="sheet-body">
+      <div class="field">
+        <label>Title *</label>
+        <input type="text" id="f_title" placeholder="Book title">
+      </div>
+      <div class="field">
+        <label>Author</label>
+        <input type="text" id="f_author" placeholder="Author name">
+      </div>
+      <div class="field">
+        <label>Genre</label>
+        <input type="text" id="f_genre" placeholder="e.g. Mystery, Sci-Fi, Fantasy">
+      </div>
+      <div class="field">
+        <label>Status</label>
+        <div class="status-selector">
+          <div class="status-option selected" data-val="want" onclick="selectStatus(this)">📚 Want to Read</div>
+          <div class="status-option" data-val="reading" onclick="selectStatus(this)">📖 Reading</div>
+          <div class="status-option" data-val="read" onclick="selectStatus(this)">✅ Read</div>
+          <div class="status-option" data-val="not_interested" onclick="selectStatus(this)">🚫 Not Interested</div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Rating</label>
+        <div class="star-rating" id="starRating">
+          <button class="star-btn" data-val="1" onclick="setRating(1)">★</button>
+          <button class="star-btn" data-val="2" onclick="setRating(2)">★</button>
+          <button class="star-btn" data-val="3" onclick="setRating(3)">★</button>
+          <button class="star-btn" data-val="4" onclick="setRating(4)">★</button>
+          <button class="star-btn" data-val="5" onclick="setRating(5)">★</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Notes / Synopsis</label>
+        <textarea id="f_notes" placeholder="Personal notes, synopsis, why you want to read it…"></textarea>
+      </div>
+      <button class="btn-primary" onclick="saveBook()">Save Book</button>
+      <button class="btn-danger" id="deleteBtn" onclick="deleteBook()" style="display:none">Remove Book</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="dataOverlay" onclick="overlayClick(event, 'dataOverlay')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <div class="sheet-title">Data & Sync</div>
+      <button class="btn-close" onclick="closeSheet('dataOverlay')">✕</button>
+    </div>
+    <div class="sheet-body">
+      <p style="font-size:14px;color:var(--muted);margin-bottom:16px;line-height:1.6;">
+        Export your library as JSON to save to iCloud Drive, or paste JSON below to import.
+      </p>
+      <div class="data-panel">
+        <div class="data-panel-row" onclick="exportJSON()">
+          <div>
+            <div class="data-panel-label">Export Library</div>
+            <div class="data-panel-desc">Copy JSON to paste into iCloud Drive</div>
+          </div>
+          <div class="data-panel-icon">📤</div>
+        </div>
+        <div class="data-panel-row" onclick="toggleImportArea()">
+          <div>
+            <div class="data-panel-label">Import from JSON</div>
+            <div class="data-panel-desc">Paste your books.json to restore library</div>
+          </div>
+          <div class="data-panel-icon">📥</div>
+        </div>
+      </div>
+      <div id="importArea" style="display:none">
+        <div class="field">
+          <label>Paste JSON here</label>
+          <textarea class="json-area" id="importJSON" placeholder='[{"title":"Book Title","author":"Author Name",...}]'></textarea>
+        </div>
+        <button class="btn-primary" onclick="importJSON()">Import Books</button>
+      </div>
+      <div style="margin-top:20px;padding:14px;background:var(--cream);border-radius:12px;border:1px solid var(--border);">
+        <div style="font-size:12px;font-weight:500;letter-spacing:0.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Shortcut Integration</div>
+        <p style="font-size:13px;color:var(--bark);line-height:1.6;">
+          Save your exported JSON as <strong>books.json</strong> in iCloud Drive → Books folder. Your Apple Shortcut can read this file to give Claude context for recommendations.
+        </p>
+      </div>
+      <div style="margin-top:12px;text-align:center;font-size:12px;color:var(--muted);">
+        <span id="bookCount">0</span> books in library
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let books = [];
+let currentTab = 'all';
+let currentSort = 'date';
+let editingId = null;
+let currentRating = 0;
+const STORAGE_KEY = 'shelf_books_v1';
+
+function load() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    books = raw ? JSON.parse(raw) : [];
+  } catch { books = []; }
+  renderList();
+  updateCounts();
+}
+
+function save() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(books));
+  updateCounts();
+}
+
+const spineColors = ['#6B4F3A','#7A9E7E','#B5703A','#8B7355','#5C7A6B','#9B6B4F','#7A8B6B'];
+
+function spineColor(title) {
+  let h = 0;
+  for (let c of title) h = (h * 31 + c.charCodeAt(0)) & 0xFFFFFFFF;
+  return spineColors[Math.abs(h) % spineColors.length];
+}
+
+function starsHTML(rating) {
+  let h = '';
+  for (let i = 1; i <= 5; i++) {
+    h += `<span class="star ${i <= rating ? 'filled' : 'empty'}">${i <= rating ? '★' : '☆'}</span>`;
+  }
+  return `<div class="stars">${h}</div>`;
+}
+
+const statusLabel = { want:'Want to Read', reading:'Reading', read:'Read', not_interested:'Not Interested' };
+const statusClass = { want:'status-want', reading:'status-reading', read:'status-read', not_interested:'status-not_interested' };
+
+function renderList() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  let filtered = books.filter(b => {
+    if (currentTab !== 'all' && b.status !== currentTab) return false;
+    if (q) return (b.title||'').toLowerCase().includes(q) || (b.author||'').toLowerCase().includes(q) || (b.genre||'').toLowerCase().includes(q);
+    return true;
+  });
+  filtered.sort((a,b) => {
+    if (currentSort === 'title') return (a.title||'').localeCompare(b.title||'');
+    if (currentSort === 'author') return (a.author||'').localeCompare(b.author||'');
+    if (currentSort === 'rating') return (b.rating||0) - (a.rating||0);
+    return (b.addedAt||0) - (a.addedAt||0);
+  });
+  const list = document.getElementById('bookList');
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">📚</div><h3>${currentTab === 'all' && !q ? 'Your shelf is empty' : 'No books found'}</h3><p>${currentTab === 'all' && !q ? 'Tap + to add your first book' : 'Try a different search or tab'}</p></div>`;
+    return;
+  }
+  list.innerHTML = filtered.map(b => `
+    <div class="book-card" data-status="${b.status}" onclick="openEditSheet('${b.id}')">
+      <div class="book-spine" style="background:${spineColor(b.title||'?')}">${(b.title||'?')[0].toUpperCase()}</div>
+      <div class="book-info">
+        <div class="book-title">${esc(b.title||'Untitled')}</div>
+        ${b.author ? `<div class="book-author">${esc(b.author)}</div>` : ''}
+        <div class="book-meta">
+          <span class="status-badge ${statusClass[b.status]}">${statusLabel[b.status]}</span>
+          ${b.rating ? starsHTML(b.rating) : ''}
+          ${b.genre ? `<span class="book-genre">${esc(b.genre)}</span>` : ''}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function updateCounts() {
+  document.getElementById('count-all').textContent = books.length;
+  document.getElementById('count-want').textContent = books.filter(b=>b.status==='want').length;
+  document.getElementById('count-reading').textContent = books.filter(b=>b.status==='reading').length;
+  document.getElementById('count-read').textContent = books.filter(b=>b.status==='read').length;
+  document.getElementById('count-not_interested').textContent = books.filter(b=>b.status==='not_interested').length;
+  document.getElementById('bookCount').textContent = books.length;
+}
+
+function switchTab(el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  currentTab = el.dataset.status;
+  renderList();
+}
+
+function setSort(el) {
+  document.querySelectorAll('.sort-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  currentSort = el.dataset.sort;
+  renderList();
+}
+
+function openAddSheet() {
+  editingId = null;
+  currentRating = 0;
+  document.getElementById('sheetTitle').textContent = 'Add Book';
+  document.getElementById('f_title').value = '';
+  document.getElementById('f_author').value = '';
+  document.getElementById('f_genre').value = '';
+  document.getElementById('f_notes').value = '';
+  document.getElementById('deleteBtn').style.display = 'none';
+  document.querySelectorAll('.status-option').forEach(o => o.classList.toggle('selected', o.dataset.val === 'want'));
+  updateStarDisplay(0);
+  document.getElementById('editOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('f_title').focus(), 350);
+}
+
+function openEditSheet(id) {
+  const b = books.find(x => x.id === id);
+  if (!b) return;
+  editingId = id;
+  currentRating = b.rating || 0;
+  document.getElementById('sheetTitle').textContent = 'Edit Book';
+  document.getElementById('f_title').value = b.title || '';
+  document.getElementById('f_author').value = b.author || '';
+  document.getElementById('f_genre').value = b.genre || '';
+  document.getElementById('f_notes').value = b.notes || '';
+  document.getElementById('deleteBtn').style.display = 'block';
+  document.querySelectorAll('.status-option').forEach(o => o.classList.toggle('selected', o.dataset.val === b.status));
+  updateStarDisplay(b.rating || 0);
+  document.getElementById('editOverlay').classList.add('open');
+}
+
+function openDataSheet() {
+  document.getElementById('dataOverlay').classList.add('open');
+  document.getElementById('importArea').style.display = 'none';
+}
+
+function closeSheet(id) { document.getElementById(id).classList.remove('open'); }
+
+function overlayClick(e, id) { if (e.target === document.getElementById(id)) closeSheet(id); }
+
+function selectStatus(el) {
+  document.querySelectorAll('.status-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function setRating(val) {
+  currentRating = currentRating === val ? 0 : val;
+  updateStarDisplay(currentRating);
+}
+
+function updateStarDisplay(val) {
+  document.querySelectorAll('.star-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.val) <= val));
+}
+
+function saveBook() {
+  const title = document.getElementById('f_title').value.trim();
+  if (!title) { showToast('Please enter a title'); return; }
+  const status = document.querySelector('.status-option.selected')?.dataset.val || 'want';
+  const data = {
+    title,
+    author: document.getElementById('f_author').value.trim(),
+    genre: document.getElementById('f_genre').value.trim(),
+    notes: document.getElementById('f_notes').value.trim(),
+    status,
+    rating: currentRating,
+  };
+  if (editingId) {
+    const idx = books.findIndex(b => b.id === editingId);
+    if (idx > -1) books[idx] = { ...books[idx], ...data };
+    showToast('Book updated');
+  } else {
+    books.unshift({ id: uid(), addedAt: Date.now(), ...data });
+    showToast('Book added');
+  }
+  save();
+  renderList();
+  closeSheet('editOverlay');
+}
+
+function deleteBook() {
+  if (!editingId) return;
+  books = books.filter(b => b.id !== editingId);
+  save();
+  renderList();
+  closeSheet('editOverlay');
+  showToast('Book removed');
+}
+
+function exportJSON() {
+  const json = JSON.stringify(books, null, 2);
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(json).then(() => showToast('JSON copied to clipboard'));
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = json;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('JSON copied');
+  }
+}
+
+function toggleImportArea() {
+  const area = document.getElementById('importArea');
+  area.style.display = area.style.display === 'none' ? 'block' : 'none';
+}
+
+function importJSON() {
+  const raw = document.getElementById('importJSON').value.trim();
+  try {
+    const data = JSON.parse(raw);
+    if (!Array.isArray(data)) throw new Error();
+    const imported = data.map(b => ({
+      id: b.id || uid(),
+      addedAt: b.addedAt || Date.now(),
+      title: b.title || '',
+      author: b.author || '',
+      genre: b.genre || '',
+      notes: b.notes || '',
+      status: ['want','reading','read','not_interested'].includes(b.status) ? b.status : 'want',
+      rating: typeof b.rating === 'number' ? b.rating : 0,
+    }));
+    books = imported;
+    save();
+    renderList();
+    closeSheet('dataOverlay');
+    showToast(`Imported ${imported.length} books`);
+  } catch { showToast('Invalid JSON — check format'); }
+}
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+load();
+</script>
+</body>
+</html>

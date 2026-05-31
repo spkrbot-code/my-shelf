@@ -209,6 +209,20 @@
     font-style: italic;
     color: white;
     text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    overflow: hidden;
+    position: relative;
+  }
+  .book-spine img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 6px;
+  }
+  .book-spine .spine-letter {
+    position: relative;
+    z-index: 1;
   }
 
   .book-info { flex: 1; min-width: 0; }
@@ -737,9 +751,57 @@ let editingId = null;
 let currentRating = 0;
 
 const STORAGE_KEY = 'shelf_books_v1';
+const COVER_STORAGE_KEY = 'shelf_covers_v1';
+
+// ─── COVER CACHE ─────────────────────────────────────────────────────────────
+let coverCache = {};
+
+function loadCovers() {
+  try {
+    const raw = localStorage.getItem(COVER_STORAGE_KEY);
+    coverCache = raw ? JSON.parse(raw) : {};
+  } catch { coverCache = {}; }
+}
+
+function saveCovers() {
+  localStorage.setItem(COVER_STORAGE_KEY, JSON.stringify(coverCache));
+}
+
+async function fetchCover(book) {
+  if (!book.title) return;
+  // Try Open Library by title+author
+  const query = encodeURIComponent(`${book.title} ${book.author||''}`).replace(/%20/g, '+');
+  const url = `https://openlibrary.org/search.json?q=${query}&limit=1&fields=cover_i`;
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    const coverId = data?.docs?.[0]?.cover_i;
+    if (coverId) {
+      const imgUrl = `https://covers.openlibrary.org/b/id/${coverId}-M.jpg`;
+      coverCache[book.id] = imgUrl;
+      saveCovers();
+      // Update just this card's spine if visible
+      const cards = document.querySelectorAll('.book-card');
+      cards.forEach(card => {
+        if (card.getAttribute('onclick')?.includes(book.id)) {
+          const spine = card.querySelector('.book-spine');
+          if (spine && !spine.querySelector('img')) {
+            const img = document.createElement('img');
+            img.src = imgUrl;
+            img.alt = '';
+            img.onerror = () => img.style.display = 'none';
+            spine.innerHTML = '';
+            spine.appendChild(img);
+          }
+        }
+      });
+    }
+  } catch { /* silent fail — keep letter spine */ }
+}
 
 // ─── PERSISTENCE ────────────────────────────────────────────────────────────
 function load() {
+  loadCovers();
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     books = raw ? JSON.parse(raw) : [];
@@ -805,11 +867,18 @@ function renderList() {
     return;
   }
 
-  list.innerHTML = filtered.map(b => `
+  list.innerHTML = filtered.map(b => {
+    const coverUrl = coverCache[b.id] || '';
+    const spineHTML = coverUrl
+      ? `<div class="book-spine" style="background:${spineColor(b.title||'?')}">
+           <img src="${coverUrl}" alt="" onerror="this.style.display='none'">
+         </div>`
+      : `<div class="book-spine" style="background:${spineColor(b.title||'?')}">
+           <span class="spine-letter">${(b.title||'?')[0].toUpperCase()}</span>
+         </div>`;
+    return `
     <div class="book-card" data-status="${b.status}" onclick="openEditSheet('${b.id}')">
-      <div class="book-spine" style="background:${spineColor(b.title||'?')}">
-        ${(b.title||'?')[0].toUpperCase()}
-      </div>
+      ${spineHTML}
       <div class="book-info">
         <div class="book-title">${esc(b.title||'Untitled')}</div>
         ${b.author ? `<div class="book-author">${esc(b.author)}</div>` : ''}
@@ -819,8 +888,10 @@ function renderList() {
           ${b.genre ? `<span class="book-genre">${esc(b.genre)}</span>` : ''}
         </div>
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
+  // Fetch covers for any books not yet cached
+  filtered.forEach(b => { if (!coverCache[b.id]) fetchCover(b); });
 }
 
 function updateCounts() {
@@ -1004,17 +1075,7 @@ function importJSON() {
 }
 
 function launchRecommendation() {
-  // Auto-export library to clipboard, then launch shortcut
-  const json = JSON.stringify(books, null, 2);
-  navigator.clipboard.writeText(json).then(() => {
-    showToast('Library synced — launching Shortcut…');
-    setTimeout(() => {
-      window.location.href = 'shortcuts://run-shortcut?name=Shelf%20Sync';
-    }, 800);
-  }).catch(() => {
-    // Clipboard failed — launch anyway
-    window.location.href = 'shortcuts://run-shortcut?name=Shelf%20Sync';
-  });
+  window.location.href = 'shortcuts://run-shortcut?name=Shelf%20Sync';
 }
 
 // ─── UTILS ───────────────────────────────────────────────────────────────────

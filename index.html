@@ -19,7 +19,9 @@
     --border: #E8E0D4;
     --shadow: rgba(26,22,18,0.08);
   }
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
+
   body {
     font-family: 'DM Sans', sans-serif;
     background: var(--cream);
@@ -27,6 +29,8 @@
     min-height: 100vh;
     min-height: -webkit-fill-available;
   }
+
+  /* HEADER */
   header {
     background: var(--ink);
     color: var(--cream);
@@ -36,20 +40,28 @@
     z-index: 100;
     padding-top: max(20px, env(safe-area-inset-top));
   }
+
   .header-top {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 14px;
   }
+
   .app-title {
     font-family: 'Playfair Display', serif;
     font-size: 28px;
     letter-spacing: -0.5px;
     line-height: 1;
   }
-  .app-title em { font-style: italic; color: var(--dusty); }
+
+  .app-title em {
+    font-style: italic;
+    color: var(--dusty);
+  }
+
   .header-actions { display: flex; gap: 8px; }
+
   .btn-icon {
     background: rgba(255,255,255,0.1);
     border: 1px solid rgba(255,255,255,0.15);
@@ -63,6 +75,8 @@
     -webkit-tap-highlight-color: transparent;
   }
   .btn-icon:active { background: rgba(255,255,255,0.2); }
+
+  /* TABS */
   .tabs {
     display: flex;
     gap: 4px;
@@ -71,6 +85,7 @@
     -webkit-overflow-scrolling: touch;
   }
   .tabs::-webkit-scrollbar { display: none; }
+
   .tab {
     flex-shrink: 0;
     padding: 6px 14px;
@@ -83,7 +98,10 @@
     -webkit-tap-highlight-color: transparent;
     white-space: nowrap;
   }
-  .tab.active { background: var(--copper); color: white; }
+  .tab.active {
+    background: var(--copper);
+    color: white;
+  }
   .tab .count {
     display: inline-block;
     background: rgba(255,255,255,0.2);
@@ -92,11 +110,14 @@
     font-size: 11px;
     margin-left: 4px;
   }
+
+  /* SEARCH BAR */
   .search-wrap {
     padding: 12px 16px;
     background: var(--warm-white);
     border-bottom: 1px solid var(--border);
   }
+
   .search-input {
     width: 100%;
     background: var(--card-bg);
@@ -111,7 +132,9 @@
     -webkit-appearance: none;
   }
   .search-input:focus { border-color: var(--copper); }
-  .search-wrap-inner { position: relative; }
+  .search-wrap-inner {
+    position: relative;
+  }
   .search-icon {
     position: absolute;
     left: 11px;
@@ -121,12 +144,15 @@
     font-size: 16px;
     pointer-events: none;
   }
+
+  /* BOOK LIST */
   .book-list {
     padding: 12px 16px 100px;
     display: flex;
     flex-direction: column;
     gap: 10px;
   }
+
   .empty-state {
     text-align: center;
     padding: 60px 20px;
@@ -140,6 +166,8 @@
     margin-bottom: 6px;
   }
   .empty-state p { font-size: 14px; line-height: 1.5; }
+
+  /* BOOK CARD */
   .book-card {
     background: var(--card-bg);
     border: 1px solid var(--border);
@@ -162,10 +190,12 @@
     width: 4px;
     border-radius: 4px 0 0 4px;
   }
+  .book-card[data-status="want"] ::before,
   .book-card[data-status="want"]::before { background: var(--copper); }
   .book-card[data-status="reading"]::before { background: var(--sage); }
   .book-card[data-status="read"]::before { background: var(--bark); }
   .book-card[data-status="not_interested"]::before { background: var(--muted); }
+
   .book-spine {
     width: 44px;
     height: 64px;
@@ -180,7 +210,9 @@
     color: white;
     text-shadow: 0 1px 2px rgba(0,0,0,0.3);
   }
+
   .book-info { flex: 1; min-width: 0; }
+
   .book-title {
     font-family: 'Playfair Display', serif;
     font-size: 16px;
@@ -189,13 +221,20 @@
     margin-bottom: 2px;
     color: var(--ink);
   }
-  .book-author { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+
+  .book-author {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
   .book-meta {
     display: flex;
     align-items: center;
     gap: 8px;
     flex-wrap: wrap;
   }
+
   .status-badge {
     font-size: 11px;
     font-weight: 500;
@@ -207,10 +246,15 @@
   .status-reading { background: #EFF6F0; color: #4A7A4E; }
   .status-read { background: #F2EBE6; color: var(--bark); }
   .status-not_interested { background: #F0EEEC; color: var(--muted); }
-  .stars { display: flex; gap: 1px; }
+
+  .stars {
+    display: flex;
+    gap: 1px;
+  }
   .star { font-size: 12px; }
   .star.filled { color: var(--copper); }
   .star.empty { color: var(--border); }
+
   .book-genre {
     font-size: 11px;
     color: var(--muted);
@@ -219,6 +263,8 @@
     border-radius: 10px;
     border: 1px solid var(--border);
   }
+
+  /* SORT BAR */
   .sort-bar {
     padding: 8px 16px 4px;
     display: flex;
@@ -243,9 +289,12 @@
   }
   .sort-chip.active {
     border-color: var(--ink);
+    color: var(--ink);
     background: var(--ink);
     color: var(--cream);
   }
+
+  /* FAB */
   .fab {
     position: fixed;
     bottom: max(24px, env(safe-area-inset-bottom, 24px));
@@ -264,6 +313,8 @@
     -webkit-tap-highlight-color: transparent;
   }
   .fab:active { transform: scale(0.92); box-shadow: 0 2px 10px rgba(181,112,58,0.3); }
+
+  /* MODAL OVERLAY */
   .overlay {
     display: none;
     position: fixed;
@@ -274,6 +325,7 @@
     align-items: flex-end;
   }
   .overlay.open { display: flex; }
+
   .sheet {
     background: var(--warm-white);
     border-radius: 24px 24px 0 0;
@@ -283,16 +335,19 @@
     overflow-y: auto;
     animation: slideUp 0.28s cubic-bezier(0.34,1.56,0.64,1);
   }
+
   @keyframes slideUp {
     from { transform: translateY(100%); }
     to { transform: translateY(0); }
   }
+
   .sheet-handle {
     width: 36px; height: 4px;
     background: var(--border);
     border-radius: 2px;
     margin: 12px auto 0;
   }
+
   .sheet-header {
     padding: 16px 20px 12px;
     display: flex;
@@ -300,11 +355,13 @@
     justify-content: space-between;
     border-bottom: 1px solid var(--border);
   }
+
   .sheet-title {
     font-family: 'Playfair Display', serif;
     font-size: 20px;
     font-weight: 600;
   }
+
   .btn-close {
     background: var(--cream);
     border: none;
@@ -316,7 +373,9 @@
     display: flex; align-items: center; justify-content: center;
     -webkit-tap-highlight-color: transparent;
   }
+
   .sheet-body { padding: 20px; }
+
   .field { margin-bottom: 18px; }
   .field label {
     display: block;
@@ -327,6 +386,7 @@
     color: var(--muted);
     margin-bottom: 7px;
   }
+
   .field input, .field textarea, .field select {
     width: 100%;
     background: var(--card-bg);
@@ -341,13 +401,17 @@
     -webkit-appearance: none;
     appearance: none;
   }
-  .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--copper); }
+  .field input:focus, .field textarea:focus, .field select:focus {
+    border-color: var(--copper);
+  }
   .field textarea { resize: none; min-height: 80px; line-height: 1.5; }
+
   .status-selector {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
   }
+
   .status-option {
     padding: 10px 12px;
     border: 1.5px solid var(--border);
@@ -360,11 +424,31 @@
     -webkit-tap-highlight-color: transparent;
     color: var(--muted);
   }
-  .status-option.selected { border-color: var(--copper); background: #FDF0E6; color: var(--copper); }
-  .status-option[data-val="reading"].selected { border-color: var(--sage); background: #EFF6F0; color: #4A7A4E; }
-  .status-option[data-val="read"].selected { border-color: var(--bark); background: #F2EBE6; color: var(--bark); }
-  .status-option[data-val="not_interested"].selected { border-color: var(--muted); background: #F0EEEC; color: var(--muted); }
-  .star-rating { display: flex; gap: 8px; }
+  .status-option.selected {
+    border-color: var(--copper);
+    background: #FDF0E6;
+    color: var(--copper);
+  }
+  .status-option[data-val="reading"].selected {
+    border-color: var(--sage);
+    background: #EFF6F0;
+    color: #4A7A4E;
+  }
+  .status-option[data-val="read"].selected {
+    border-color: var(--bark);
+    background: #F2EBE6;
+    color: var(--bark);
+  }
+  .status-option[data-val="not_interested"].selected {
+    border-color: var(--muted);
+    background: #F0EEEC;
+    color: var(--muted);
+  }
+
+  .star-rating {
+    display: flex;
+    gap: 8px;
+  }
   .star-btn {
     font-size: 28px;
     cursor: pointer;
@@ -377,6 +461,7 @@
   }
   .star-btn.active { color: var(--copper); }
   .star-btn:active { transform: scale(1.3); }
+
   .btn-primary {
     width: 100%;
     background: var(--ink);
@@ -393,6 +478,7 @@
     margin-top: 4px;
   }
   .btn-primary:active { opacity: 0.8; }
+
   .btn-danger {
     width: 100%;
     background: transparent;
@@ -407,6 +493,8 @@
     margin-top: 10px;
     -webkit-tap-highlight-color: transparent;
   }
+
+  /* IMPORT/EXPORT PANEL */
   .data-panel {
     background: var(--card-bg);
     border: 1.5px solid var(--border);
@@ -428,6 +516,7 @@
   .data-panel-label { font-size: 15px; font-weight: 500; }
   .data-panel-desc { font-size: 12px; color: var(--muted); margin-top: 1px; }
   .data-panel-icon { font-size: 20px; }
+
   .toast {
     position: fixed;
     bottom: max(90px, calc(env(safe-area-inset-bottom) + 80px));
@@ -444,7 +533,11 @@
     transition: all 0.3s;
     white-space: nowrap;
   }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
   textarea.json-area {
     font-family: 'SF Mono', monospace;
     font-size: 12px;
@@ -492,6 +585,7 @@
 
 <button class="fab" onclick="openAddSheet()">+</button>
 
+<!-- ADD / EDIT SHEET -->
 <div class="overlay" id="editOverlay" onclick="overlayClick(event, 'editOverlay')">
   <div class="sheet" id="editSheet">
     <div class="sheet-handle"></div>
@@ -521,7 +615,7 @@
           <div class="status-option" data-val="not_interested" onclick="selectStatus(this)">🚫 Not Interested</div>
         </div>
       </div>
-      <div class="field">
+      <div class="field" id="ratingField">
         <label>Rating</label>
         <div class="star-rating" id="starRating">
           <button class="star-btn" data-val="1" onclick="setRating(1)">★</button>
@@ -541,6 +635,7 @@
   </div>
 </div>
 
+<!-- DATA SHEET -->
 <div class="overlay" id="dataOverlay" onclick="overlayClick(event, 'dataOverlay')">
   <div class="sheet">
     <div class="sheet-handle"></div>
@@ -550,7 +645,7 @@
     </div>
     <div class="sheet-body">
       <p style="font-size:14px;color:var(--muted);margin-bottom:16px;line-height:1.6;">
-        Export your library as JSON to save to iCloud Drive, or paste JSON below to import.
+        Export your library as JSON to save to iCloud Drive, or paste JSON below to import. This keeps your data safe across resets and devices.
       </p>
       <div class="data-panel">
         <div class="data-panel-row" onclick="exportJSON()">
@@ -568,6 +663,7 @@
           <div class="data-panel-icon">📥</div>
         </div>
       </div>
+
       <div id="importArea" style="display:none">
         <div class="field">
           <label>Paste JSON here</label>
@@ -575,12 +671,22 @@
         </div>
         <button class="btn-primary" onclick="importJSON()">Import Books</button>
       </div>
-      <div style="margin-top:20px;padding:14px;background:var(--cream);border-radius:12px;border:1px solid var(--border);">
-        <div style="font-size:12px;font-weight:500;letter-spacing:0.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Shortcut Integration</div>
-        <p style="font-size:13px;color:var(--bark);line-height:1.6;">
-          Save your exported JSON as <strong>books.json</strong> in iCloud Drive → Books folder. Your Apple Shortcut can read this file to give Claude context for recommendations.
+
+      <div style="margin-top:4px;">
+        <button class="btn-primary" onclick="syncAndRecommend()" style="background:var(--copper);display:flex;align-items:center;justify-content:center;gap:8px;">
+          <span style="font-size:18px;">✦</span> Sync & Get Recommendation
+        </button>
+        <p style="font-size:12px;color:var(--muted);text-align:center;margin-top:8px;line-height:1.5;">
+          Export first, then tap this to save to iCloud and get 3 book recommendations.
         </p>
       </div>
+      <div style="margin-top:16px;padding:14px;background:var(--cream);border-radius:12px;border:1px solid var(--border);">
+        <div style="font-size:12px;font-weight:500;letter-spacing:0.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Setup Required</div>
+        <p style="font-size:13px;color:var(--bark);line-height:1.6;">
+          The button above requires a Shortcut named <strong>"Shelf Sync"</strong> installed on your phone. See setup instructions for how to build it.
+        </p>
+      </div>
+
       <div style="margin-top:12px;text-align:center;font-size:12px;color:var(--muted);">
         <span id="bookCount">0</span> books in library
       </div>
@@ -591,13 +697,16 @@
 <div class="toast" id="toast"></div>
 
 <script>
+// ─── STATE ──────────────────────────────────────────────────────────────────
 let books = [];
 let currentTab = 'all';
 let currentSort = 'date';
 let editingId = null;
 let currentRating = 0;
+
 const STORAGE_KEY = 'shelf_books_v1';
 
+// ─── PERSISTENCE ────────────────────────────────────────────────────────────
 function load() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -612,6 +721,7 @@ function save() {
   updateCounts();
 }
 
+// ─── RENDER ─────────────────────────────────────────────────────────────────
 const spineColors = ['#6B4F3A','#7A9E7E','#B5703A','#8B7355','#5C7A6B','#9B6B4F','#7A8B6B'];
 
 function spineColor(title) {
@@ -620,7 +730,7 @@ function spineColor(title) {
   return spineColors[Math.abs(h) % spineColors.length];
 }
 
-function starsHTML(rating) {
+function starsHTML(rating, small = true) {
   let h = '';
   for (let i = 1; i <= 5; i++) {
     h += `<span class="star ${i <= rating ? 'filled' : 'empty'}">${i <= rating ? '★' : '☆'}</span>`;
@@ -635,23 +745,39 @@ function renderList() {
   const q = document.getElementById('searchInput').value.toLowerCase();
   let filtered = books.filter(b => {
     if (currentTab !== 'all' && b.status !== currentTab) return false;
-    if (q) return (b.title||'').toLowerCase().includes(q) || (b.author||'').toLowerCase().includes(q) || (b.genre||'').toLowerCase().includes(q);
+    if (q) {
+      return (b.title||'').toLowerCase().includes(q) ||
+             (b.author||'').toLowerCase().includes(q) ||
+             (b.genre||'').toLowerCase().includes(q);
+    }
     return true;
   });
+
+  // Sort
   filtered.sort((a,b) => {
     if (currentSort === 'title') return (a.title||'').localeCompare(b.title||'');
     if (currentSort === 'author') return (a.author||'').localeCompare(b.author||'');
     if (currentSort === 'rating') return (b.rating||0) - (a.rating||0);
     return (b.addedAt||0) - (a.addedAt||0);
   });
+
   const list = document.getElementById('bookList');
+
   if (filtered.length === 0) {
-    list.innerHTML = `<div class="empty-state"><div class="empty-icon">📚</div><h3>${currentTab === 'all' && !q ? 'Your shelf is empty' : 'No books found'}</h3><p>${currentTab === 'all' && !q ? 'Tap + to add your first book' : 'Try a different search or tab'}</p></div>`;
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📚</div>
+        <h3>${currentTab === 'all' && !q ? 'Your shelf is empty' : 'No books found'}</h3>
+        <p>${currentTab === 'all' && !q ? 'Tap + to add your first book' : 'Try a different search or tab'}</p>
+      </div>`;
     return;
   }
+
   list.innerHTML = filtered.map(b => `
     <div class="book-card" data-status="${b.status}" onclick="openEditSheet('${b.id}')">
-      <div class="book-spine" style="background:${spineColor(b.title||'?')}">${(b.title||'?')[0].toUpperCase()}</div>
+      <div class="book-spine" style="background:${spineColor(b.title||'?')}">
+        ${(b.title||'?')[0].toUpperCase()}
+      </div>
       <div class="book-info">
         <div class="book-title">${esc(b.title||'Untitled')}</div>
         ${b.author ? `<div class="book-author">${esc(b.author)}</div>` : ''}
@@ -661,18 +787,25 @@ function renderList() {
           ${b.genre ? `<span class="book-genre">${esc(b.genre)}</span>` : ''}
         </div>
       </div>
-    </div>`).join('');
+    </div>
+  `).join('');
 }
 
 function updateCounts() {
-  document.getElementById('count-all').textContent = books.length;
-  document.getElementById('count-want').textContent = books.filter(b=>b.status==='want').length;
-  document.getElementById('count-reading').textContent = books.filter(b=>b.status==='reading').length;
-  document.getElementById('count-read').textContent = books.filter(b=>b.status==='read').length;
-  document.getElementById('count-not_interested').textContent = books.filter(b=>b.status==='not_interested').length;
-  document.getElementById('bookCount').textContent = books.length;
+  const all = books.length;
+  const want = books.filter(b=>b.status==='want').length;
+  const reading = books.filter(b=>b.status==='reading').length;
+  const read = books.filter(b=>b.status==='read').length;
+  const ni = books.filter(b=>b.status==='not_interested').length;
+  document.getElementById('count-all').textContent = all;
+  document.getElementById('count-want').textContent = want;
+  document.getElementById('count-reading').textContent = reading;
+  document.getElementById('count-read').textContent = read;
+  document.getElementById('count-not_interested').textContent = ni;
+  document.getElementById('bookCount').textContent = all;
 }
 
+// ─── TABS & SORT ─────────────────────────────────────────────────────────────
 function switchTab(el) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
@@ -687,6 +820,7 @@ function setSort(el) {
   renderList();
 }
 
+// ─── SHEET LOGIC ─────────────────────────────────────────────────────────────
 function openAddSheet() {
   editingId = null;
   currentRating = 0;
@@ -696,7 +830,9 @@ function openAddSheet() {
   document.getElementById('f_genre').value = '';
   document.getElementById('f_notes').value = '';
   document.getElementById('deleteBtn').style.display = 'none';
-  document.querySelectorAll('.status-option').forEach(o => o.classList.toggle('selected', o.dataset.val === 'want'));
+  document.querySelectorAll('.status-option').forEach(o => {
+    o.classList.toggle('selected', o.dataset.val === 'want');
+  });
   updateStarDisplay(0);
   document.getElementById('editOverlay').classList.add('open');
   setTimeout(() => document.getElementById('f_title').focus(), 350);
@@ -713,7 +849,9 @@ function openEditSheet(id) {
   document.getElementById('f_genre').value = b.genre || '';
   document.getElementById('f_notes').value = b.notes || '';
   document.getElementById('deleteBtn').style.display = 'block';
-  document.querySelectorAll('.status-option').forEach(o => o.classList.toggle('selected', o.dataset.val === b.status));
+  document.querySelectorAll('.status-option').forEach(o => {
+    o.classList.toggle('selected', o.dataset.val === b.status);
+  });
   updateStarDisplay(b.rating || 0);
   document.getElementById('editOverlay').classList.add('open');
 }
@@ -723,9 +861,13 @@ function openDataSheet() {
   document.getElementById('importArea').style.display = 'none';
 }
 
-function closeSheet(id) { document.getElementById(id).classList.remove('open'); }
+function closeSheet(id) {
+  document.getElementById(id).classList.remove('open');
+}
 
-function overlayClick(e, id) { if (e.target === document.getElementById(id)) closeSheet(id); }
+function overlayClick(e, id) {
+  if (e.target === document.getElementById(id)) closeSheet(id);
+}
 
 function selectStatus(el) {
   document.querySelectorAll('.status-option').forEach(o => o.classList.remove('selected'));
@@ -738,13 +880,18 @@ function setRating(val) {
 }
 
 function updateStarDisplay(val) {
-  document.querySelectorAll('.star-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.val) <= val));
+  document.querySelectorAll('.star-btn').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.val) <= val);
+  });
 }
 
+// ─── CRUD ────────────────────────────────────────────────────────────────────
 function saveBook() {
   const title = document.getElementById('f_title').value.trim();
   if (!title) { showToast('Please enter a title'); return; }
+
   const status = document.querySelector('.status-option.selected')?.dataset.val || 'want';
+
   const data = {
     title,
     author: document.getElementById('f_author').value.trim(),
@@ -753,6 +900,7 @@ function saveBook() {
     status,
     rating: currentRating,
   };
+
   if (editingId) {
     const idx = books.findIndex(b => b.id === editingId);
     if (idx > -1) books[idx] = { ...books[idx], ...data };
@@ -761,6 +909,7 @@ function saveBook() {
     books.unshift({ id: uid(), addedAt: Date.now(), ...data });
     showToast('Book added');
   }
+
   save();
   renderList();
   closeSheet('editOverlay');
@@ -775,11 +924,13 @@ function deleteBook() {
   showToast('Book removed');
 }
 
+// ─── IMPORT / EXPORT ─────────────────────────────────────────────────────────
 function exportJSON() {
   const json = JSON.stringify(books, null, 2);
   if (navigator.clipboard) {
     navigator.clipboard.writeText(json).then(() => showToast('JSON copied to clipboard'));
   } else {
+    // Fallback
     const ta = document.createElement('textarea');
     ta.value = json;
     document.body.appendChild(ta);
@@ -799,7 +950,7 @@ function importJSON() {
   const raw = document.getElementById('importJSON').value.trim();
   try {
     const data = JSON.parse(raw);
-    if (!Array.isArray(data)) throw new Error();
+    if (!Array.isArray(data)) throw new Error('Expected array');
     const imported = data.map(b => ({
       id: b.id || uid(),
       addedAt: b.addedAt || Date.now(),
@@ -815,11 +966,23 @@ function importJSON() {
     renderList();
     closeSheet('dataOverlay');
     showToast(`Imported ${imported.length} books`);
-  } catch { showToast('Invalid JSON — check format'); }
+  } catch(e) {
+    showToast('Invalid JSON — check format');
+  }
 }
 
-function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
-function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function syncAndRecommend() {
+  window.location.href = 'shortcuts://run-shortcut?name=Shelf%20Sync';
+}
+
+// ─── UTILS ───────────────────────────────────────────────────────────────────
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+}
+
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 
 function showToast(msg) {
   const t = document.getElementById('toast');
@@ -828,6 +991,7 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2500);
 }
 
+// ─── INIT ────────────────────────────────────────────────────────────────────
 load();
 </script>
 </body>
